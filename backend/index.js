@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const port = process.env.PORT || 4000;
 const express = require("express");
 const app = express();
@@ -11,7 +13,12 @@ app.use(express.json());
 app.use(cors());
 
 // Database connection with mongodb
-mongoose.connect("mongodb+srv://greatkarthik:greatkarthik@cluster0.7qlq9um.mongodb.net/Ecommerce");
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+.then(() => console.log("Connected to MongoDB"))
+.catch(err => console.log("MongoDB connection error:", err));
 
 // API creation
 app.get('/', (req, res) => {
@@ -162,7 +169,7 @@ app.post('/signup', async (req, res) => {
         }
     };
 
-    const token = jwt.sign(data, 'secret_ecom');
+    const token = jwt.sign(data, process.env.JWT_SECRET);
     res.json({ success: true, token });
 });
 
@@ -176,7 +183,7 @@ app.post('/login', async (req, res) => {
                     id: user.id
                 }
             };
-            const token = jwt.sign(data, 'secret_ecom');
+            const token = jwt.sign(data, process.env.JWT_SECRET);
             res.json({ success: true, token });
         } else {
             res.json({ success: false, errors: "Wrong Password" });
@@ -207,7 +214,7 @@ const fetchUser = async (req, res, next) => {
         return res.status(401).send({ errors: 'Please authenticate using valid token' });
     }
     try {
-        const data = jwt.verify(token, 'secret_ecom');
+        const data = jwt.verify(token, process.env.JWT_SECRET);
         req.user = data.user;
         next();
     } catch (error) {
