@@ -39,15 +39,15 @@ const upload = multer({ storage: storage });
 app.use('/images', express.static('upload/images'));
 
 // Upload endpoint
+
 app.post("/upload", upload.single('product'), (req, res) => {
-    const host = req.get('host');
+    // Use your deployed backend URL here
+    const backendUrl = "https://ecommerce-karthik-s-shopsy-1.onrender.com";
     res.json({
         success: 1,
-        image_url: `http://${host}/images/${req.file.filename}`.toLowerCase()
+        image_url: `${backendUrl}/images/${req.file.filename}`.toLowerCase()
     });
 });
-
-// Schema for products
 const Product = mongoose.model("product", {
     id: {
         type: Number,
